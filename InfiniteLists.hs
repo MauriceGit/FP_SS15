@@ -5,8 +5,10 @@ module InfiniteLists where
 -- names = ["a".."z", "a1".."z1", "a2".."z2", ...]
 
 names :: [String]
-names = undefined
-
+names = [q | q <- alphas] ++ [a ++ b | b <- nums, a <- alphas]
+	where 
+		alphas = map (:[]) ['a'..'z']
+		nums   = map show [1..]
 
 -- | constructs the infinite sequence
 -- of fibonacci numbers in linear time
@@ -73,3 +75,4 @@ merges' :: [[Integer]] -> [Integer]
 merges' = undefined    -- after chapter about folds
 
 -- ----------------------------------------
+
