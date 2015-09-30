@@ -35,10 +35,7 @@ nub' (x : xs) = x : nub [y | y <- xs, y /= x]
 
 nub'' :: Eq a => [a] -> [a]
 nub'' [] = []
-nub'' l = foldr (\ x xs -> (blubb x xs) ++ xs) [] l
-	where blubb
-		| [] == [y | y <- xs, x == y] = [x]
-		| otherwise = []
+nub'' ls = foldr (\ x xs -> x : filter (/= x) xs) [] ls
 
 
 -- ----------------------------------------
@@ -66,10 +63,10 @@ splitAt i xs = (take i xs, drop i xs)
 -- the impl
 splitAt' :: Int -> [a] -> ([a], [a])
 splitAt' n xs
-	| n <= 0          = ([], xs)
+    | n <= 0          = ([], xs)
 splitAt' n []           = ([],[])
 splitAt' n (x : xs)     = (x:t,d)
-	where 	(t,d) = splitAt' (n-1) xs 
+    where   (t,d) = splitAt' (n-1) xs 
 
 
 -- ----------------------------------------
@@ -87,7 +84,9 @@ intercalate l (bl : bll) = bl ++ l ++ intercalate l bll
 -- 2. impl: with foldr
 -- after chapter about folds
 intercalate' :: [a] -> [[a]] -> [a]
-intercalate' = undefined
+intercalate' _ [[]] = []
+intercalate' _ (bl : []) = bl
+intercalate' l (bl : bll) = bl ++ foldr (\ x xs -> xs ++ l ++ x) [] bll
 
 -- ----------------------------------------
 
@@ -105,17 +104,22 @@ partition p xs
 partition' :: (a -> Bool) -> [a] -> ([a], [a])
 partition' p [] = ([],[])
 partition' p (x:xs)
-	| blubb     = (x:t, f)
-	| otherwise = (t, x:f)
-	where
-		blubb = p x
-		(t, f) = partition' p xs
+    | blubb     = (x:t, f)
+    | otherwise = (t, x:f)
+    where
+        blubb = p x
+        (t, f) = partition' p xs
 
 -- 2. impl: with foldr
 -- after chapter about folds
 
 partition'' :: (a -> Bool) -> [a] -> ([a], [a])
-partition'' = undefined
+partition'' _ [] = ([],[])
+partition'' p l = foldr (\ x (x1,y1) -> (fst (blubb p x) ++ x1, snd (blubb p x) ++ y1)) ([],[]) l
+    where
+        blubb p x
+            | p x = ([x], [])
+            | otherwise = ([], [x])
 
 -- ----------------------------------------
 --
@@ -133,7 +137,8 @@ inits (x:xs) = [] : map (x:) (inits xs)
 -- after chapter about folds
 
 inits'        :: [a] -> [[a]]
-inits' = undefined
+inits' [] = [[]]
+inits' l = [] : (foldr (\ x xs -> [x] : (map (x:) xs)) [] l)
 
 -- ----------------------------------------
 
@@ -155,25 +160,25 @@ join' c (x:xs) = x ++ [c] ++ (join' c xs)
 split' :: Eq a => a -> [a] -> [[a]]
 split' _ [] = [[]]
 split' c (x:xs)
-	| c == x = [] : split' c xs
-	| otherwise = [[x] ++ l] ++ ls
-	where
-		(l:ls) = split' c xs
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+    | c == x = [] : split' c xs
+    | otherwise = [[x] ++ l] ++ ls
+    where
+        (l:ls) = split' c xs
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
     
 -- ----------------------------------------

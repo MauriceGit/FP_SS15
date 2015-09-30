@@ -40,7 +40,7 @@ merge (x1, y1) (x2, y2) = (min x1 x2, max y1 y2)
 type IntervalSet = [Interval]
 
 inv :: IntervalSet -> Bool
-inv is = and (map (not . emptyInterval) is) -- Keins ist leer
+inv is =  (map (not . emptyInterval) is) -- Keins ist leer
         && and (zipWith blubb is (tail is))
         where blubb i1 i2 = not (overlap i1 i2) && (less i1 i2)
 
