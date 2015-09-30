@@ -34,7 +34,11 @@ nub' (x : xs) = x : nub [y | y <- xs, y /= x]
 -- after chapter about folds
 
 nub'' :: Eq a => [a] -> [a]
-nub'' = undefined
+nub'' [] = []
+nub'' l = foldr (\ x xs -> (blubb x xs) ++ xs) [] l
+	where blubb
+		| [] == [y | y <- xs, x == y] = [x]
+		| otherwise = []
 
 
 -- ----------------------------------------
