@@ -51,11 +51,12 @@ concat l        = P.foldr append empty l
 
 -- like map for normal lists: foldr ((:) . f) []
 map             :: (a -> b) -> List a -> List b
-map f           = undefined --map cons l
+map f			= foldr (cons . f) empty
+-- map f           = foldr (\ x xs -> append (fromList [(f x)]) xs) empty 
 
 -- foldr with foldr for normal lists
 foldr           :: (a -> b -> b) -> b -> List a -> b
-foldr op n      = undefined
+foldr op n l     = P.foldr op n (toList l)
 
 -- head, tail, null
 head            :: List a -> a
@@ -67,9 +68,10 @@ tail            :: List a -> List a
 tail        l   = \ xs -> P.tail (l xs)
 
 null            :: List a -> Bool
-null      l      = P.null . toList l
+-- null      l      = P.null ( toList l)
+null 	 		 = P.null . toList
 
 reverse         :: List a -> List a
-reverse         = undefined
+reverse       l  = (P.reverse . l)
 
 -- ----------------------------------------
