@@ -28,11 +28,15 @@ data Tree a
 
 -- | smart constructor
 bin :: Tree a -> Tree a -> Tree a
-bin  = undefined
+bin Null r = r
+bin l Null = l
+bin l r = Bin l r
 
 instance Functor Tree where
-  fmap = undefined
-
+  fmap f Null = Null
+  fmap f (Tip x) = Tip (f x)
+  fmap f (Bin x y) = Bin (fmap f x) (fmap f y)
+  
 instance Applicative Tree where
   pure  = undefined
   (<*>) = undefined
@@ -77,10 +81,15 @@ maxDepth = visitTree undefined undefined undefined
 -- ----------------------------------------
 -- access functions
 
-viewL :: Tree a -> Maybe (a, Tree a)
-viewL = undefined
+viewL :: Tree a -> Maybe (a, Tree a) -- gibt das linkeste Element aus und den Restbaum ohne das Element (Head + Tail)
+viewL Null = Nothing
+viewL (Tip x) = Just (x, Null)
+viewL (Bin left right) = Just (l, bin q right)
+	where 
+	Just (l, q) = viewL left
+viewL (Bin (Tip l) r) = Just (l, r)
 
-viewR :: Tree a -> Maybe (Tree a, a)
+viewR :: Tree a -> Maybe (Tree a, a)-- gibt das rechteste Element aus und den Restbaum ohne das Element (Init + Last)
 viewR = undefined
 
 head :: Tree a -> a
