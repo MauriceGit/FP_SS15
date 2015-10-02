@@ -59,7 +59,9 @@ instance Monoid (Tree a) where
 
 -- fold elements like in a list from right to left
 instance Foldable Tree where
-  foldr _ e t = undefined
+  foldr f e Null = e
+  foldr f e (Tip t) = f t e
+  foldr f e (Bin l r) = foldr f (foldr f e r) l
 
 -- ----------------------------------------
 -- classical visitor
@@ -67,30 +69,36 @@ instance Foldable Tree where
 visitTree :: b -> (a -> b) -> (b -> b -> b) -> Tree a -> b
 visitTree e tf bf = visit'
   where
-    visit' = undefined
+    visit' Null = e
+    visit' (Tip t) = tf t
+    visit' (Bin left right) = bf (visit' left) (visit' right)
 
 -- special visitors
 
 sizeTree :: Tree a -> Int
-sizeTree = visitTree undefined undefined undefined
+sizeTree = visitTree 0 (const 1) (+)
 
 minDepth, maxDepth :: Tree a -> Int
-minDepth = visitTree undefined undefined undefined
-maxDepth = visitTree undefined undefined undefined
+minDepth = visitTree 0 (\ t -> 1) (\ x y -> min x y + 1)
+maxDepth = visitTree 0 (\ t -> 1) (\ x y -> max x y + 1)
 
 -- ----------------------------------------
 -- access functions
 
-viewL :: Tree a -> Maybe (a, Tree a) -- gibt das linkeste Element aus und den Restbaum ohne das Element (Head + Tail)
+viewL :: Tree a -> Maybe (a, Tree a) -- gibt das linkeste Element aus und den 
+                                     -- Restbaum ohne das Element (Head, Tail)
 viewL Null = Nothing
 viewL (Tip x) = Just (x, Null)
 viewL (Bin left right) = Just (l, bin q right)
-	where 
-	Just (l, q) = viewL left
-viewL (Bin (Tip l) r) = Just (l, r)
+    where 
+    Just (l, q) = viewL left
 
 viewR :: Tree a -> Maybe (Tree a, a)-- gibt das rechteste Element aus und den Restbaum ohne das Element (Init + Last)
-viewR = undefined
+viewR Null = Nothing
+viewR (Tip x) = Just (Null, x)
+viewR (Bin left right) = Just (bin left l, r)
+    where
+    Just (l,r) = viewR right
 
 head :: Tree a -> a
 head = maybe (error "head: empty tree") fst . viewL
@@ -107,23 +115,29 @@ init = maybe (error "init: empty tree") fst . viewR
 -- ----------------------------------------
 -- conversions to/from lists
 
+
+
 -- | runs in O(n) due to the use of (:)
 toList :: Tree a -> [a]
-toList = foldr undefined undefined
+toList = foldr (:) []
 
 -- | runs in O(n^2) due to the use of (++)
 toListSlow :: Tree a -> [a]
-toListSlow = visitTree undefined undefined undefined
+toListSlow = visitTree [] (:[]) (++)
 
 -- | build a balanced tree
 --
 -- doesn't work for infinite lists
 
--- weak balancing criterion
-fromList :: [a] -> Tree a
-fromList = undefined
-
 -- strong balancing criterion
+fromList :: [a] -> Tree a
+fromList [] = Null
+fromList (x : []) = Tip x
+fromList xs = Bin (fromList l) (fromList r)
+    where
+        (l, r) = splitAt (div (length xs) 2) xs
+
+-- weak balancing criterion
 fromList' :: [a] -> Tree a
 fromList' = undefined
 

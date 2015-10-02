@@ -21,6 +21,12 @@ prop_fromList''' xs
   = toList (fromList'' xs) == xs
 
 
+prop_minDepth ::  [Int] -> Bool
+prop_minDepth xs = min (length xs) 2 == minDepth (fromList'' xs)
+
+prop_maxDepth ::  [Int] -> Bool
+prop_maxDepth xs = maxDepth (fromList'' xs) == length xs
+	
 -- strong balancing criterium
 -- length of paths may be differ at most by 1
 prop_balance :: Tree Int -> Bool
