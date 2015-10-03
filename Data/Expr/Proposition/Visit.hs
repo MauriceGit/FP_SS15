@@ -14,10 +14,23 @@ data Visitor r
       }
 
 idExpr :: Visitor Expr
-idExpr
-  = undefined
+idExpr = V {vLit = Lit . id, vVar = Var . id, vUnary = Unary . id, vBinary = Binary . id}
+
+negVarsExpr :: Visitor Expr
+negVarsExpr = V {vLit = (\ b -> Lit (not b)), vVar = Var . id, vUnary = Unary . id, vBinary = Binary . id}
+  
+-- Testfall:
+-- visit negVarsExpr ( either (error.show) id (parse' "true && true || false => true"))
+-- visit idExpr ( either (error.show) id (parse' "a && b || c => d"))
 
 visit :: Visitor r -> Expr -> r
-visit v e = undefined
+visit vi = visit'
+    where
+        visit' (Lit b) = (vLit vi) b
+        visit' (Var v) = (vVar vi) v
+        visit' (Unary f e) = (vUnary vi) f (visit' e)
+        visit' (Binary f e1 e2) = (vBinary vi) f (visit' e1) (visit' e2)
+
 
 -- ----------------------------------------
+  
