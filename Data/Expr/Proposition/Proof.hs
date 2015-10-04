@@ -38,6 +38,7 @@ proof' e = proof'' table e
             | otherwise = proof'' xs e
             where
                 -- eine bestimmte Möglichkeit für eine Variablenbelegung!
+                -- das Map ist nur dafür da, um aus Bool --> Lit Bool, also eine gleichwertige Expression zu machen
                 env = zip vars (map (Lit . id) x)
         
         -- freie Variablen sind immer konstant gleich!
