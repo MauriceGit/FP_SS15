@@ -12,7 +12,12 @@ import           Data.Maybe                       (listToMaybe)
 -- ----------------------------------------
 
 truthTable :: Int -> [[Bool]]
-truthTable n = undefined
+truthTable 0 = [] 
+truthTable 1 = [[True],[False]]
+truthTable n = append' True ++ (append' False)
+    where
+    append' b = map (\ xs -> [b]++xs) tRec
+    tRec = truthTable (n-1)
 
 -- compute a proof by generating a truth table,
 -- iterate over all rows in the table
@@ -23,9 +28,26 @@ truthTable n = undefined
 -- is a tautology
 
 proof' :: Expr -> Maybe VarEnv
-proof' e
-  = undefined
-
+proof' e = proof'' table e
+    where
+        -- proof'' bekommt eine Reihe der Wahrheitstafel übergeben!
+        proof'' [] _ = Nothing -- > Tautologie!
+        proof'' (x:xs) e 
+            -- Eine Variablenbelegung wertet zu False aus!
+            | not (eval (substVars env e)) = Just env
+            | otherwise = proof'' xs e
+            where
+                -- eine bestimmte Möglichkeit für eine Variablenbelegung!
+                env = zip vars (map (Lit . id) x)
+        
+        -- freie Variablen sind immer konstant gleich!
+        vars = freeVars e
+        -- table ist immer konstant gleich!
+        table = truthTable (length vars)
+    
+-- Testfall:
+-- proof ( either (error.show) id (parse' "true && true || false => b"))
+-- proof ( either (error.show) id (parse' "b && c || a => b"))
 
 proof :: Expr -> String
 proof e
