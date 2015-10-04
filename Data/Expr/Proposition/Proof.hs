@@ -16,7 +16,7 @@ truthTable 0 = []
 truthTable 1 = [[True],[False]]
 truthTable n = append' True ++ (append' False)
     where
-    append' b = map (\ xs -> [b]++xs) tRec
+    append' b = map ([b]++) tRec
     tRec = truthTable (n-1)
 
 -- compute a proof by generating a truth table,
