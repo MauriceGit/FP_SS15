@@ -14,7 +14,7 @@ data Visitor r
       }
 
 idExpr :: Visitor Expr
-idExpr = V {vLit = Lit . id, vVar = Var . id, vUnary = Unary . id, vBinary = Binary . id}
+idExpr = V {vLit = Lit, vVar = Var . id, vUnary = Unary , vBinary = Binary . id}
 
 negVarsExpr :: Visitor Expr
 negVarsExpr = V {vLit = (\ b -> Lit (not b)), vVar = Var . id, vUnary = Unary . id, vBinary = Binary . id}
