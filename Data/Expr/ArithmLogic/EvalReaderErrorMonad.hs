@@ -79,33 +79,49 @@ type Env = Map Ident Value
 newtype Result a = RR { unRR :: Env -> ResVal a }
 
 instance Functor Result where
-  fmap = undefined
+  {--
+  fmap f (RR a) = RR (\ env -> 
+                        let y = a env in 
+                        do 
+                            z <- y
+                            return (f z)
+                     )
+                     --}
+  fmap f a = do
+            r <- a
+            return (f r)
   
 instance Applicative Result where
   pure = return
   (<*>) = ap
-
-{--
-instance Monad Result where
-  return x = R x
-  (R x) >>= f = f x
-  (E x) >>= f = E x
---}
-instance Monad Result where
-  return x = R x
-   (R x) >>= f = f x
-    x >>= f = x
   
+instance Monad Result where
+  return x = RR (\ env -> return x)
+  
+--  (>>=) :: Result a -> (a -> Result b) -> Result b
+--              x               f              res
+  x >>= f = RR ( \ env ->
+            
+            let y = (unRR x) env in 
+            do
+                a <- y
+                unRR (f a) env
+            )
+            
+            
+-- throwError :: MonadError e m => e -> m a
+-- catchError :: MonadError EvalError m => m Result -> (EvalError -> m Result) -> m Result
 instance MonadError EvalError Result where
   throwError e
-    = undefined
-  catchError (RR ef) handler
-    = undefined
+    = RR (\ _ -> throwError e)
+  catchError e handler
+    = undefined -- RR (\ env -> handler e)
 
+-- local :: MonadReader r m => (r -> r) -> m a -> m a
 instance MonadReader Env Result where
-  ask             = undefined
-  local f (RR ef) = undefined
-
+  ask             = RR (\ env -> return env)
+  local f (RR ef) = RR (\ env -> ef (f env))
+  
 -- ----------------------------------------
 -- error handling
   
@@ -145,7 +161,12 @@ eval' e = (unRR . eval) e M.empty -- start with an empty environment
 eval :: Expr -> Result Value
 eval (BLit b)          = return (B b)
 eval (ILit i)          = return (I i)
-eval (Var    x)        = freeVar xasd
+eval (Var    x)        = do
+                            env <- ask 
+                            case M.lookup x env of
+                                (Just v) -> return v
+                                Nothing -> freeVar x
+                                
 eval (Unary  op e1)    = do v1  <- eval e1
                             mf1 op v1
 
@@ -158,7 +179,12 @@ eval (Cond   c e1 e2)  = do b <- evalBool c
                               then eval e1
                               else eval e2
 
-eval (Let x e1 e2)     = undefined
+-- let x = e1 in e2
+-- let x = True in (x || False)
+-- local :: MonadReader r m => (r -> r) -> m a -> m a
+eval (Let x e1 e2) = do
+                        value <- eval e1
+                        local (M.insert x value) (eval e2)
 
 evalBool :: Expr -> Result Bool
 evalBool e
