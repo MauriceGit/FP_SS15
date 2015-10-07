@@ -3,11 +3,11 @@ where
 
 import           Data.Expr.Imperative
 import qualified Data.Expr.Imperative.EvalStateErrorMonad    as S
-{--
+{-
 import qualified Data.Expr.Imperative.EvalIOStateErrorMonad  as O
 import qualified Data.Expr.Imperative.EvalStateErrorTrans    as ST
 import qualified Data.Expr.Imperative.EvalIOStateErrorTrans  as OT
---}
+-- -}
 import           Data.Pretty
 
 import           Data.Maybe
@@ -49,7 +49,7 @@ eval1 = S.eval'
 pp1 :: Expr -> IO ()
 pp1 = putStrLn . pretty . eval1
 
--- {-
+ {-
 eval2 :: Expr -> IO (O.ResVal O.Value, O.Store)
 eval2 = O.eval'
 

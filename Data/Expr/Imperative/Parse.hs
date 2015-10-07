@@ -42,7 +42,6 @@ expr0
   , prim
   , condExpr
   , whileExpr
-  , tryExpr
   , writeExpr
   , lit0, lit :: Parser Expr
 
@@ -106,7 +105,6 @@ prim
       <|> (reserved "false"  >> return false)
       <|> condExpr
       <|> whileExpr
-      <|> tryExpr
       <|> (mkIntegerLit <$> (natural <* whiteSpace))
       <|> (var <$> identifier)
       <|> (reserved "read"   >> (read' <$> option "" stringLit))
@@ -128,11 +126,6 @@ whileExpr
        e2 <- reserved "do"    >> expr <* reserved "done"
        return $ while e1 e2
 
-tryExpr
-  = do e1 <- reserved "try"   >> expr
-       e2 <- reserved "catch" >> expr <* reserved "done"
-       return $ try' e1 e2
-       
 writeExpr
   = do msg <- reserved "write" >> option "" stringLit
        e   <- prim
@@ -147,7 +140,6 @@ arithmLogicDef
       { P.reservedNames
             = [ "if", "then", "else", "fi"
               , "while", "do", "done"
-              , "try", "catch"
               , "not", "ord", "signum"
               , "read", "write"
               ]

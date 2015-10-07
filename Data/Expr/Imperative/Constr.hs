@@ -23,9 +23,6 @@ cond = Cond
 while :: Expr -> Expr -> Expr
 while = While
 
-try' :: Expr -> Expr -> Expr
-try' = Try
-
 read' :: String -> Expr
 read' = Read
 

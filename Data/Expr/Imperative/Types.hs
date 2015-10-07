@@ -7,16 +7,27 @@ module Data.Expr.Imperative.Types where
 import Data.Pretty
 
 data Expr
-  = BLit   Bool
-  | ILit   Integer
-  | Var    Ident
-  | Unary  Op1   Expr
-  | Binary Op2   Expr Expr
-  | Cond   Expr  Expr Expr
-  | While  Expr  Expr
-  | Try    Expr  Expr
-  | Read   String
-  | Write  String Expr
+  = BLit   { _bval :: Bool    }
+  | ILit   { _ival :: Integer }
+  | Var    { _var  :: Ident   }
+  | Unary  { _op1  :: Op1
+           , _e1   :: Expr
+           }
+  | Binary { _op2  :: Op2
+           , _e1   :: Expr
+           , _e2   :: Expr
+           }
+  | Cond   { _cond :: Expr
+           , _e1   :: Expr
+           , _e2   :: Expr
+           }
+  | While  { _cond :: Expr
+           , _body :: Expr
+           }
+  | Read   { _msg  :: String }
+  | Write  { _msg  :: String
+           , _e1   :: Expr
+           }
   deriving (Eq, Ord, Show)
 
 type Ident = String
@@ -68,11 +79,6 @@ instance Pretty Expr where
                              pretty c
                              ++ " do " ++
                              pretty b
-                             ++ " done"
-  pretty (Try e1 e2)       = "try " ++
-                             pretty e1
-                             ++ " catch " ++
-                             pretty e2
                              ++ " done"
   pretty (Read s)          = "read" ++
                              ( if null s
