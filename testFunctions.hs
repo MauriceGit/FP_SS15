@@ -26,6 +26,10 @@ reverse' = foldr' (\ x xs -> xs ++ [x]) []
 reverse'' :: [a] -> [a]
 reverse'' = foldl' (\ xs x -> x : xs ) []
 
+-- tricky reverse
+reverse''' :: [a] -> [a]
+reverse''' = foldl' (flip (:)) []
+
 
 
 
